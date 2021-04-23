@@ -17,6 +17,7 @@ async function start() {
   let board = response.data.board;
 
   displayBoard(board);
+  console.log(board);
 }
 
 /** Display board */

@@ -34,7 +34,20 @@ class BoggleAppTestCase(TestCase):
         """Test starting a new game."""
 
         with self.client as client:
-            ...
+            response = client.get("/api/new-game")
+            # breakpoint()
+            # get_json() method does not return json-- it converts the JSON back to whatever type it should be
+            key_and_game_board = response.get_json()
+            self.assertEqual(response.status_code, 200)
+            # tests to make sure the games dictionary contains a key of the game_id itself
+            self.assertIn(key_and_game_board['gameId'], games.keys())
+            # test to make sure the gameId value in the response is a string
+            self.assertIsInstance(key_and_game_board['gameId'], str)
+            # test to make sure the board value in the response is a list
+            self.assertIsInstance(key_and_game_board['board'], list)
+            # loop of tests to make sure that each element in the board value list is also a list
+            for list_in_list in key_and_game_board['board']:
+                self.assertIsInstance(list_in_list, list)
             # write a test for this route
             # the route returns JSON with a string game id, and a list-of-lists for the board
             # the route stores the new game in the games dictionary
