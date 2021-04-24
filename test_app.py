@@ -27,7 +27,7 @@ class BoggleAppTestCase(TestCase):
             # test that you're getting a template
             self.assertEqual(response.status_code, 200)
             self.assertIn('<table class="board">', html)
-            self.assertIn('<form method="POST" id="newWordForm">', html)
+            self.assertIn('<form id="newWordForm">', html)
            
 
     def test_api_new_game(self):
@@ -51,3 +51,51 @@ class BoggleAppTestCase(TestCase):
             # write a test for this route
             # the route returns JSON with a string game id, and a list-of-lists for the board
             # the route stores the new game in the games dictionary
+
+
+    def test_api_score_word(self):
+        """Test validity of player's words"""
+
+        with self.client as client:
+            response = client.get("/api/new-game")
+            key_and_game_board = response.get_json()
+
+            test_game_id = key_and_game_board["gameId"]
+
+            games[test_game_id].board = [
+                ["O", "N", "N", "E", "O"],
+                ["X", "K", "E", "S", "A"],
+                ["E", "C", "M", "Z", "N"],
+                ["L", "F", "X", "F", "S"],
+                ["B", "T", "O", "N", "C"]
+            ]
+
+            #test if valid word is on board
+            post_response = client.post('/api/score-word',
+                           json={'gameId': test_game_id,
+                           'word' : 'TON'
+                           })
+            json_response = post_response.get_json()
+
+            self.assertEqual(post_response.status_code, 200)
+            self.assertEqual("ok",json_response["result"])
+
+            #test if word is not a valid word
+            post_response = client.post('/api/score-word',
+                           json={'gameId': test_game_id,
+                           'word' : 'TTT'
+                           })
+            json_response = post_response.get_json()
+
+            self.assertEqual(post_response.status_code, 200)
+            self.assertEqual("not-word",json_response["result"])
+
+            #test if word is not the board
+            post_response = client.post('/api/score-word',
+                           json={'gameId': test_game_id,
+                           'word' : 'CAT'
+                           })
+            json_response = post_response.get_json()
+
+            self.assertEqual(post_response.status_code, 200)
+            self.assertEqual("not-on-board",json_response["result"])

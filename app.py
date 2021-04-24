@@ -37,6 +37,18 @@ def new_game():
 
 @app.route('/api/score-word', methods=['POST'])
 def validate_word():
+    """
+    handles API POST request
+    requires the following data:
+        { 
+        gameID: gameId,
+        word: word
+        }
+
+    Returns JSON: {result: "not-word | not-on-board | ok"}
+    
+    """
+
     word_to_check = request.json["word"]
     game_id = request.json["gameId"]
     current_game = games[game_id]
